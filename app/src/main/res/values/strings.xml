@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AdGo</string>
+
+    <!-- page titles -->
+    <string name="bag_fragment_title">My Bag</string>
+    <string name="map_fragment_title">Map</string>
+
+   <string name="empty_bag">Empty</string>
+</resources>
