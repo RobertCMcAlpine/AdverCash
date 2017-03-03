@@ -167,7 +167,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     @Override
     public void onStop(){
         super.onStop();
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient == null){}
+        else {
+            mGoogleApiClient.disconnect();
+        }
     }
 
 

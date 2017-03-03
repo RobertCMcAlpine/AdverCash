@@ -1,9 +1,22 @@
 <resources>
-    <string name="app_name">AdGo</string>
+    <string name="app_name">AdverCash</string>
 
     <!-- page titles -->
     <string name="bag_fragment_title">My Bag</string>
     <string name="map_fragment_title">Map</string>
 
-   <string name="empty_bag">Empty</string>
+    <string name="empty_bag">Empty</string>
+
+    <string name="balance_message"><b>Balance: £</b></string>
+
+    <string name="facebook_app_id">266232723832181</string>
+
+    <string name="fb_login_protocol_scheme">fb266232723832181</string>
+
+    <string name="picture">Picture</string>
+    <string name="description_info">Info</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+
+    <string name="take_picture">Take picture</string>
 </resources>

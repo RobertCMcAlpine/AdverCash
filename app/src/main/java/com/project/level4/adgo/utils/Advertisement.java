@@ -55,7 +55,6 @@ public class Advertisement {
     }
 
     public String getAdOwner() {
-
         return adOwner;
     }
 
