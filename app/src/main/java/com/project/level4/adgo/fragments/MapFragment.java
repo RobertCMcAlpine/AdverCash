@@ -30,11 +30,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.project.level4.adgo.R;
-
-import static android.content.Context.LOCATION_SERVICE;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -42,6 +41,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         LocationListener {
 
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+
+    // AD LOCATIONS
+    private static LatLng NIKE_AD_LATLNG = new LatLng(55.872542, -4.285932);
+    private static LatLng STARBUCKS_AD_LATLNG = new LatLng(55.872831, -4.284360);
+    private static LatLng UNI_AD_LATLNG_1 = new LatLng(55.873280, -4.288431);
+    private static LatLng UNI_AD_LATLNG_2 = new LatLng(55.872296, -4.288120);
+    private static LatLng UNI_AD_LATLNG_3 = new LatLng(55.872493, -4.284723);
+    private static LatLng UNI_AD_LATLNG_4 = new LatLng(55.873588, -4.291568);
+
+
+
 
     private MapView mMapView;
     private GoogleMap mGoogleMap;
@@ -81,6 +91,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     }
 
     @Override
+    public void onStart(){
+        super.onStart();
+        addMarkers();
+    }
+
+    public void addMarkers(){
+        if (mGoogleMap != null) {
+            mGoogleMap.addMarker(new MarkerOptions().position(NIKE_AD_LATLNG)
+                    .title("Nike"));
+            mGoogleMap.addMarker(new MarkerOptions().position(STARBUCKS_AD_LATLNG)
+                    .title("Starbucks"));
+            mGoogleMap.addMarker(new MarkerOptions().position(UNI_AD_LATLNG_1)
+                    .title("Library"));
+            mGoogleMap.addMarker(new MarkerOptions().position(UNI_AD_LATLNG_2)
+                    .title("University of Glasgow"));
+            mGoogleMap.addMarker(new MarkerOptions().position(UNI_AD_LATLNG_3)
+                    .title("UoG GUU"));
+            mGoogleMap.addMarker(new MarkerOptions().position(UNI_AD_LATLNG_4)
+                    .title("UoG QMU"));
+        }
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap=googleMap;
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
@@ -104,6 +137,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         }
         //Once request accepted, get current location
         mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        addMarkers();
     }
 
     private void checkLocationPermission() {
@@ -146,6 +180,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+        addMarkers();
     }
 
     @Override
@@ -157,11 +192,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
-    }
-
-    @Override
-    public void onStart(){
-        super.onStart();
     }
 
     @Override

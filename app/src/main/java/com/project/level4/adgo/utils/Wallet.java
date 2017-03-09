@@ -16,7 +16,7 @@ public class Wallet {
         return balance;
     }
 
-    public void addToWallet(long value){
+    public void addToWallet(double value){
         balance += value;
     }
 

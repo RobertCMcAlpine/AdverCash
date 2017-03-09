@@ -1,8 +1,13 @@
 package com.project.level4.adgo.activities;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -22,17 +27,23 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.level4.adgo.R;
+import com.project.level4.adgo.utils.Advertisement;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,7 +55,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends Activity {
     private static final String TAG = "AndroidCameraApi";
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -75,11 +86,44 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+
         textureView = (TextureView) findViewById(R.id.texture);
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
 
+        textureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchRingDialog(v);
+            }
+        });
+
     }
+
+    public void launchRingDialog(View view) {
+        final Advertisement ad = new Advertisement("nike", getResources().getDrawable(R.drawable.nikeicon, null), "20% Discount in store", getResources().getDrawable(R.drawable.qrcodeicon, null), 0.05);
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(CameraActivity.this, "Watching Ad", "View to Win!", true);
+        ringProgressDialog.setIcon(ad.getAdIcon());
+        ringProgressDialog.setCancelable(false);
+        new Thread(new Runnable() {
+            @Override
+             public void run() {
+                try {
+                    Thread.sleep(10000);
+                } catch (Exception e) {
+
+                }
+                ringProgressDialog.dismiss();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+
+                //set viewed add as extra
+                intent.putExtra("ad", ad.getAdOwner());
+                startActivity(intent);
+                finish();
+            }
+        }).start();
+    }
+
 
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override

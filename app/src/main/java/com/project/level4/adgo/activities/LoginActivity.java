@@ -28,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
         if (isLoggedIn()){
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
+            finish();
         }
 
         facebookIcon = (ImageView) findViewById(R.id.facebook_icon);
@@ -45,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
+                finish();
             }
 
             @Override

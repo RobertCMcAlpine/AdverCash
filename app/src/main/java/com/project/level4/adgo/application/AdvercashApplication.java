@@ -14,6 +14,7 @@ import android.content.Intent;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
+import com.estimote.sdk.Utils;
 import com.project.level4.adgo.R;
 import com.project.level4.adgo.activities.CameraActivity;
 import com.project.level4.adgo.activities.MainActivity;
@@ -31,7 +32,7 @@ public class AdvercashApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        ad = new Advertisement("nike", getResources().getDrawable(R.drawable.nikeicon, null),
+        ad = new Advertisement("Nike", getResources().getDrawable(R.drawable.nikeicon, null),
                 "20% Discount in store", getResources().getDrawable(R.drawable.qrcodeicon, null), 0.05);
 
         beaconManager = new BeaconManager(getApplicationContext());
@@ -41,11 +42,7 @@ public class AdvercashApplication extends Application {
             public void onEnteredRegion(Region region, List<Beacon> list) {
                 showNotification(
                         "Advertisement Found",
-                        "Please stand within 5 metres of Advertisement and aim your " +
-                                "smartphone camera at the advertisment to claim your reward");
-
-                Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
-                startActivity(intent);
+                        "View advertisement to win ");
             }
             @Override
             public void onExitedRegion(Region region) {
@@ -57,9 +54,9 @@ public class AdvercashApplication extends Application {
             @Override
             public void onServiceReady() {
                 beaconManager.startMonitoring(new Region(
-                        "monitored region",
-                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
-                        22504, 48827));
+                        "monitored ad",
+                        UUID.fromString("f7826da6-4fa2-4e98-8024-bc5b71e0893e"),
+                        5425, 2658));
             }
         });
     }
@@ -71,8 +68,8 @@ public class AdvercashApplication extends Application {
                 new Intent[]{notifyIntent}, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.nikeicon)
-                .setContentTitle(ad.getAdOwner())
-                .setContentText(ad.getReward())
+                .setContentTitle(title + ": " + ad.getAdOwner())
+                .setContentText(message + ad.getReward())
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .build();

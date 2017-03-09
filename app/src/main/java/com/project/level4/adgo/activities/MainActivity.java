@@ -1,5 +1,7 @@
 package com.project.level4.adgo.activities;
 
+import android.content.Intent;
+import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.estimote.sdk.SystemRequirementsChecker;
+import com.estimote.sdk.Utils;
 import com.project.level4.adgo.R;
 import com.project.level4.adgo.adapters.FixedTabsPagerAdapter;
 
@@ -27,9 +30,28 @@ public class MainActivity extends FragmentActivity {
     private BeaconManager beaconManager;
     private Region region;
 
+    public List<String> viewedAds = new ArrayList<String>();
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        String tempAd = null;
+
+        if(savedInstanceState !=null) {
+            if (savedInstanceState.containsKey("ad")) {
+                tempAd = savedInstanceState.getString("ad");
+                viewedAds.add(tempAd);
+            }
+        }
+
+        if (tempAd == null) {
+            Intent intent = getIntent();
+            tempAd = intent.getStringExtra("ad");
+            if (tempAd != null) {
+                viewedAds.add(intent.getStringExtra("ad"));
+            }
+        }
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         PagerAdapter pagerAdapter = new FixedTabsPagerAdapter(getSupportFragmentManager(), getApplicationContext());
@@ -41,7 +63,7 @@ public class MainActivity extends FragmentActivity {
         // setup advertisment estimote info here
         beaconManager = new BeaconManager(this);
         region = new Region("ranged region",
-                UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, null);
+                UUID.fromString("f7826da6-4fa2-4e98-8024-bc5b71e0893e"), null, null);
 
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
@@ -49,8 +71,15 @@ public class MainActivity extends FragmentActivity {
                 if (!list.isEmpty()) {
                     Beacon nearestBeacon = list.get(0);
                     List<String> places = placesNearBeacon(nearestBeacon);
-                    // TODO: update the UI here
+                    double distance = Utils.computeAccuracy(nearestBeacon);
                     Log.d("Advertisement", "Nearest ads: " + places);
+                    Log.d("Advertisement", "DISTANCE TO AD: " + distance);
+
+                    if (distance < 1 && viewedAds.isEmpty()){
+                        Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
                 }
             }
         });
@@ -74,6 +103,14 @@ public class MainActivity extends FragmentActivity {
     protected void onPause() {
         beaconManager.stopRanging(region);
         super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (!viewedAds.isEmpty()) {
+            outState.putString("ad", viewedAds.get(0));
+        }
     }
 
     private static final Map<String, List<String>> ADVERTISEMENTS_BY_BEACONS;

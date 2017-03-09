@@ -8,7 +8,7 @@
     android:id="@+id/bag_fragment_layout">
 
     <RelativeLayout
-        android:id="@+id/anchor"
+        android:id="@+id/account_information"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tab"
@@ -48,7 +48,7 @@
         android:id="@+id/advertisement_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/anchor"
+        android:layout_below="@id/account_information"
         android:layout_weight="1"
         android:drawSelectorOnTop="false"/>
 
