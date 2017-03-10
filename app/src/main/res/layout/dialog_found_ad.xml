@@ -5,30 +5,29 @@
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true">
 
-    <ImageView
-        android:id="@+id/dialog_qrcode"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_centerHorizontal="true"
-        android:paddingTop="50dp"
-        android:src="@drawable/qrcodeicon"
-        android:layout_alignParentTop="true"/>
 
     <ImageView
-        android:id="@+id/dialog_ad_image"
+        android:id="@+id/dialog_found_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/dialog_qrcode"
         android:paddingTop="20dp"/>
 
     <TextView
-        android:id="@+id/dialog_reward_message"
+        android:id="@+id/dialog_found_message1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/dialog_ad_image"
+        android:layout_below="@id/dialog_found_image"
         android:paddingTop="20dp"
-        android:paddingBottom="20dp"
+        android:textSize="20sp"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/dialog_found_message2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog_found_message1"
+        android:paddingTop="5dp"
         android:textSize="20sp"
         android:layout_centerHorizontal="true"/>
 

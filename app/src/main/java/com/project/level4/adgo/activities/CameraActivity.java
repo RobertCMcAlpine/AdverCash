@@ -5,11 +5,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -22,6 +26,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -29,6 +34,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -68,24 +74,58 @@ public class CameraActivity extends Activity {
     }
 
     private TextureView textureView;
+    private ImageView adListing;
+    private ImageView placeholderQR;
+    private TextView adInformation;
     private String cameraId;
+    private ImageView adOwner;
+
+    private DialogInterface.OnCancelListener mOnCancelListener;
+
+
     protected CameraDevice cameraDevice;
     protected CameraCaptureSession cameraCaptureSessions;
-    protected CaptureRequest captureRequest;
+
     protected CaptureRequest.Builder captureRequestBuilder;
     private Size imageDimension;
     private ImageReader imageReader;
-    private File file;
+
+    private Toolbar toolbar;
+
     private static final int REQUEST_CAMERA_PERMISSION = 200;
-    private boolean mFlashSupported;
+
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
+
+    private android.support.v7.app.AlertDialog.Builder dialog1;
+    private android.support.v7.app.AlertDialog.Builder dialog2;
+    private LayoutInflater factory;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+
+        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+
+        dialog1 = new android.support.v7.app.AlertDialog.Builder(this);
+        dialog2 = new android.support.v7.app.AlertDialog.Builder(this);
+        factory = LayoutInflater.from(this);
+
+//        adListing = (ImageView) findViewById(R.id.camera_ad_icon);
+        adInformation = (TextView) findViewById(R.id.camera_ad_info);
+        adOwner = (ImageView) findViewById(R.id.camera_ad_owner);
+        placeholderQR = (ImageView) findViewById(R.id.qr_code_placeholder_reward);
+
+        toolbar.setNavigationIcon(resize(getResources().getDrawable(R.drawable.ad_finder_icon, null), 100, 100));
+        toolbar.setTitle("Point at the ad with this alien");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        placeholderQR.setImageDrawable(getResources().getDrawable(R.drawable.qrcodeicon, null));
+        adOwner.setImageDrawable(getResources().getDrawable(R.drawable.nikeicon, null));
+//        adListing.setImageDrawable(getResources().getDrawable(R.drawable.nike_hightop, null));
+        adInformation.setText("Reward: 20% Discount in Store\n\n\n Prize: £0.05");
 
         textureView = (TextureView) findViewById(R.id.texture);
         assert textureView != null;
@@ -100,28 +140,76 @@ public class CameraActivity extends Activity {
 
     }
 
+    private Drawable resize(Drawable image, int xSize, int ySize) {
+        Bitmap b = ((BitmapDrawable)image).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, xSize, ySize, false);
+        return new BitmapDrawable(getResources(), bitmapResized);
+    }
+
     public void launchRingDialog(View view) {
+        final int sec = 10;
+        // hard coded adverstisement
         final Advertisement ad = new Advertisement("nike", getResources().getDrawable(R.drawable.nikeicon, null), "20% Discount in store", getResources().getDrawable(R.drawable.qrcodeicon, null), 0.05);
-        final ProgressDialog ringProgressDialog = ProgressDialog.show(CameraActivity.this, "Watching Ad", "View to Win!", true);
-        ringProgressDialog.setIcon(ad.getAdIcon());
-        ringProgressDialog.setCancelable(false);
-        new Thread(new Runnable() {
-            @Override
-             public void run() {
-                try {
-                    Thread.sleep(10000);
-                } catch (Exception e) {
 
+        final View dialogView = factory.inflate(R.layout.dialog_countdown, null);
+
+        dialog1.setView(dialogView);
+
+        mOnCancelListener = new DialogInterface.OnCancelListener() {
+
+            CountDownTimer countDownTimer = new CountDownTimer(sec * 1000, 300) {
+                // 500 means, onTick function will be called at every 500 milliseconds
+
+                ProgressBar progressBar = (ProgressBar) dialogView.findViewById(R.id.circular_progress_bar) ;
+                TextView countdown = (TextView) dialogView.findViewById(R.id.countdown);
+                TextView countdownMessage = (TextView) dialogView.findViewById(R.id.countdown_message);
+
+
+                @Override
+                public void onTick(long leftTimeInMilliseconds) {
+                    long seconds = leftTimeInMilliseconds / 1000;
+                    progressBar.setProgress((int)seconds);
+                    countdownMessage.setText("Remaining Time to Win: ");
+                    countdown.setText(Long.toString(seconds) + " seconds");
                 }
-                ringProgressDialog.dismiss();
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                @Override
+                public void onFinish() {
+                    if(countdown.getText().equals("0 seconds")){
+                        View successDialogView = factory.inflate(R.layout.dialog_success, null);
 
-                //set viewed add as extra
-                intent.putExtra("ad", ad.getAdOwner());
-                startActivity(intent);
-                finish();
+                        dialog2.setView(successDialogView);
+
+                        TextView successMessage = (TextView) successDialogView.findViewById(R.id.success_message);
+                        TextView congratulationsMessage = (TextView) successDialogView.findViewById(R.id.congratulations_message);
+                        ImageView tickIcon = (ImageView) successDialogView.findViewById(R.id.complete_image);
+
+                        tickIcon.setImageDrawable(resize(getResources().getDrawable(R.drawable.green_tick_icon, null), 300, 300));
+                        congratulationsMessage.setText("Congratulations!");
+                        successMessage.setText("Your bag has been updated with rewards");
+
+                        mOnCancelListener = new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                intent.putExtra("ad", ad.getAdOwner());
+                                startActivity(intent);
+                                finish();
+                            }
+                        };
+                        dialog2.setOnCancelListener(mOnCancelListener);
+                    }
+                    dialog2.show();
+                }
+            }.start();
+
+            @Override
+            public void onCancel(DialogInterface dialog) {
+               countDownTimer.cancel();
             }
-        }).start();
+
+        };
+        dialog1.setOnCancelListener(mOnCancelListener);
+        dialog1.show();
     }
 
 
@@ -168,14 +256,6 @@ public class CameraActivity extends Activity {
         }
     };
 
-    final CameraCaptureSession.CaptureCallback captureCallbackListener = new CameraCaptureSession.CaptureCallback() {
-        @Override
-        public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
-            super.onCaptureCompleted(session, request, result);
-            Toast.makeText(CameraActivity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
-            createCameraPreview();
-        }
-    };
 
     protected void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");

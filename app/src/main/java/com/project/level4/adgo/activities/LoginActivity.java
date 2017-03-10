@@ -1,8 +1,13 @@
 package com.project.level4.adgo.activities;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 
 import com.facebook.AccessToken;
@@ -14,7 +19,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.project.level4.adgo.R;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends Activity {
 
     private LoginButton loginButton;
     private CallbackManager callbackManager;
@@ -30,6 +35,11 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.login_toolbar);
+        toolbar.setNavigationIcon(resize(getResources().getDrawable(R.drawable.ad_finder_icon, null), 100, 100));
+        toolbar.setTitle("Advercash");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
 
         facebookIcon = (ImageView) findViewById(R.id.facebook_icon);
         facebookIcon.setImageDrawable(getResources().getDrawable(R.drawable.facebook_icon, null));
@@ -70,5 +80,11 @@ public class LoginActivity extends AppCompatActivity {
     public boolean isLoggedIn() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         return accessToken != null;
+    }
+
+    private Drawable resize(Drawable image, int xSize, int ySize) {
+        Bitmap b = ((BitmapDrawable)image).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, xSize, ySize, false);
+        return new BitmapDrawable(getResources(), bitmapResized);
     }
 }

@@ -2,6 +2,9 @@ package com.project.level4.adgo.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -25,7 +28,6 @@ import java.util.List;
 public class BagFragment extends Fragment {
 
     private ImageView walletIcon;
-    private TextView message;
     private TextView balance;
 
     private Advertisement advertisements[] = new Advertisement[1];
@@ -58,7 +60,6 @@ public class BagFragment extends Fragment {
         super.onStart();
 
         walletIcon = (ImageView) getView().findViewById(R.id.wallet_icon);
-        message = (TextView) getView().findViewById(R.id.balance_message);
         balance = (TextView) getView().findViewById(R.id.balance);
 
         walletIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_account_balance_wallet_black_48dp, null));
@@ -75,9 +76,12 @@ public class BagFragment extends Fragment {
 
                 ImageView walletImage = (ImageView) dialogView.findViewById(R.id.my_wallet_icon);
                 TextView balanceMessage = (TextView) dialogView.findViewById(R.id.my_current_balance);
+                ImageView shareImage = (ImageView) dialogView.findViewById(R.id.share_facebook);
 
                 walletImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_account_balance_wallet_black_48dp, null));
                 balanceMessage.setText("Balance: £" + String.format("%.2f", wallet.getBalance()));
+                shareImage.setImageDrawable(getResources().getDrawable(R.drawable.share_facebook, null));
+
                 balanceDialog.setView(dialogView);
                 balanceDialog.setPositiveButton("Withdraw Balance", new DialogInterface.OnClickListener() {
                     @Override

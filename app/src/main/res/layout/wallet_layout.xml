@@ -20,9 +20,16 @@
         android:layout_below="@id/my_wallet_icon"
         android:paddingTop="20dp"
         android:textSize="20sp"
-        android:layout_centerHorizontal="true"
-        android:paddingBottom="80dp"/>
+        android:layout_centerHorizontal="true" />
 
+    <ImageView
+        android:id="@+id/share_facebook"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/my_current_balance"
+        android:paddingTop="20dp"
+        android:paddingBottom="60dp"/>
 
 
 </RelativeLayout>

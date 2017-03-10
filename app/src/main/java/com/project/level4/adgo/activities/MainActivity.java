@@ -1,13 +1,23 @@
 package com.project.level4.adgo.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Parcelable;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
@@ -29,6 +39,11 @@ public class MainActivity extends FragmentActivity {
 
     private BeaconManager beaconManager;
     private Region region;
+    private boolean viewed;
+    private boolean repeater = true;
+
+    private AlertDialog.Builder dialog;
+    private LayoutInflater factory;
 
     public List<String> viewedAds = new ArrayList<String>();
 
@@ -36,12 +51,17 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        viewed = false;
         String tempAd = null;
+
+        dialog = new AlertDialog.Builder(this);
+        factory = LayoutInflater.from(this);
 
         if(savedInstanceState !=null) {
             if (savedInstanceState.containsKey("ad")) {
                 tempAd = savedInstanceState.getString("ad");
                 viewedAds.add(tempAd);
+                viewed = true;
             }
         }
 
@@ -50,7 +70,35 @@ public class MainActivity extends FragmentActivity {
             tempAd = intent.getStringExtra("ad");
             if (tempAd != null) {
                 viewedAds.add(intent.getStringExtra("ad"));
+                viewed = true;
             }
+        }
+
+        if (viewed){
+            final View buyView = factory.inflate(R.layout.dialog_purchase, null);
+            ImageView adImage = (ImageView) buyView.findViewById(R.id.dialog_ad);
+            adImage.setImageDrawable(getResources().getDrawable(R.drawable.nike_hightop, null));
+            ImageView buyImage = (ImageView) buyView.findViewById(R.id.dialog_buy_now);
+            buyImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent viewIntent =
+                            new Intent("android.intent.action.VIEW",
+                                    Uri.parse("https://www.amazon.co.uk/Nike-Skateboarding-Zoom-Trainers-Black/dp/B01N9R8LP0/ref=sr_1_6?ie=UTF8&qid=1489059216&sr=8-6&keywords=zoom+dunk"));
+                    startActivity(viewIntent);
+                }
+            });
+            TextView purchaseMessage = (TextView) buyView.findViewById(R.id.buy_now_reward);
+            purchaseMessage.setText("Nike SkateBoarding Zoom Trainer");
+            buyImage.setImageDrawable(getResources().getDrawable(R.drawable.buy_now, null));
+            dialog.setView(buyView);
+            dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // nothing
+                }
+            });
+            dialog.show();
         }
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -75,10 +123,30 @@ public class MainActivity extends FragmentActivity {
                     Log.d("Advertisement", "Nearest ads: " + places);
                     Log.d("Advertisement", "DISTANCE TO AD: " + distance);
 
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                    builder.setIcon(getResources().getDrawable(R.drawable.ad_finder_icon, null));
+                    builder.setMessage("Ad located in your vacinity!");
+                    builder.create();
+
                     if (distance < 1 && viewedAds.isEmpty()){
                         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
                         startActivity(intent);
                         finish();
+                    } else if (distance > 1 && repeater){
+                        repeater = false;
+                        final View foundAdView = factory.inflate(R.layout.dialog_found_ad, null);
+
+                        ImageView appImage = (ImageView) foundAdView.findViewById(R.id.dialog_found_image);
+                        appImage.setImageDrawable(getResources().getDrawable(R.drawable.ad_finder_icon, null));
+
+                        TextView foundAdMessage1 = (TextView) foundAdView.findViewById(R.id.dialog_found_message1);
+                        foundAdMessage1.setText("Ad found in your vacinity!");
+
+                        TextView foundAdMessage2 = (TextView) foundAdView.findViewById(R.id.dialog_found_message2);
+                        foundAdMessage2.setText("Look for an Ad with the alien symbol");
+
+                        dialog.setView(foundAdView);
+                        dialog.show();
                     }
                 }
             }
@@ -120,17 +188,9 @@ public class MainActivity extends FragmentActivity {
         Map<String, List<String>> placesByBeacons = new HashMap<>();
         placesByBeacons.put("22504:48827", new ArrayList<String>() {{
             add("Nike");
-            // read as: "Heavenly Sandwiches" is closest
-            // to the beacon with major 22504 and minor 48827
-            // add("Green & Green Salads");
-            // "Green & Green Salads" is the next closest
-            // add("Mini Panini");
-            // "Mini Panini" is the furthest away
         }});
         placesByBeacons.put("648:12", new ArrayList<String>() {{
             add("Nike");
-            // add("Green & Green Salads");
-            // add("Heavenly Sandwiches");
         }});
         ADVERTISEMENTS_BY_BEACONS = Collections.unmodifiableMap(placesByBeacons);
     }

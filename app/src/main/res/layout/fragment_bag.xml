@@ -51,5 +51,4 @@
         android:layout_below="@id/account_information"
         android:layout_weight="1"
         android:drawSelectorOnTop="false"/>
-
 </RelativeLayout>

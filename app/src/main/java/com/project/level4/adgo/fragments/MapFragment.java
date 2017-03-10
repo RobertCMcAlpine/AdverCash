@@ -247,7 +247,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
         //move map camera
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(16));
     }
 
 
@@ -274,4 +274,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
             mLocation = mGoogleMap.getMyLocation();
         }
     }
+
+
 }
