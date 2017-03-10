@@ -2,9 +2,6 @@ package com.project.level4.adgo.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -86,13 +83,13 @@ public class BagFragment extends Fragment {
                 balanceDialog.setPositiveButton("Withdraw Balance", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // TODO nothing in prototype
+                        // nothing in prototype
                     }
                 });
                 balanceDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // nothing
+                        // nothing in prototype
                     }
                 });
                 balanceDialog.show();
@@ -100,8 +97,8 @@ public class BagFragment extends Fragment {
         });
 
 
-
-        if (!viewedAds.isEmpty()) {
+        // simply check if ad has been added to balance (hack)
+        if (!viewedAds.isEmpty() && wallet.getBalance() < 0.05) {
             wallet.addToWallet(0.05);
             balance.setText(String.format("%.2f", wallet.getBalance()));
             Advertisement ad = new Advertisement("nike", getResources().getDrawable(R.drawable.nikeicon, null), "20% Discount in store", getResources().getDrawable(R.drawable.qrcodeicon, null), 0.05);

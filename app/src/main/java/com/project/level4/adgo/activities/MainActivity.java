@@ -36,7 +36,7 @@ public class MainActivity extends FragmentActivity {
     private BeaconManager beaconManager;
     private Region region;
     private boolean viewed;
-    private boolean repeater = true;
+    private boolean listening = true;
 
     private AlertDialog.Builder dialog;
     private LayoutInflater factory;
@@ -109,27 +109,34 @@ public class MainActivity extends FragmentActivity {
         region = new Region("ranged region",
                 UUID.fromString("f7826da6-4fa2-4e98-8024-bc5b71e0893e"), null, null);
 
+
+        //
+        beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
+            @Override
+            public void onEnteredRegion(Region region, List<Beacon> list) {
+                Log.d("Advertisement", "Enetered Beacon Region");
+            }
+            @Override
+            public void onExitedRegion(Region region) {
+                // could add an "exit" notification too if you want (-:
+            }
+        });
+
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
             public void onBeaconsDiscovered(Region region, List<Beacon> list) {
                 if (!list.isEmpty()) {
                     Beacon nearestBeacon = list.get(0);
-                    List<String> places = placesNearBeacon(nearestBeacon);
                     double distance = Utils.computeAccuracy(nearestBeacon);
-                    Log.d("Advertisement", "Nearest ads: " + places);
                     Log.d("Advertisement", "DISTANCE TO AD: " + distance);
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-                    builder.setIcon(getResources().getDrawable(R.drawable.ad_finder_icon, null));
-                    builder.setMessage("Ad located in your vacinity!");
-                    builder.create();
 
                     if (distance < 1 && viewedAds.isEmpty()){
                         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
                         startActivity(intent);
-                        finish();
-                    } else if (distance > 1 && repeater){
-                        repeater = false;
+                        beaconManager.stopRanging(region);
+                    }
+                  else if (distance > 1 && listening){
+                        listening = false;
                         final View foundAdView = factory.inflate(R.layout.dialog_found_ad, null);
 
                         ImageView appImage = (ImageView) foundAdView.findViewById(R.id.dialog_found_image);
@@ -141,6 +148,7 @@ public class MainActivity extends FragmentActivity {
                         TextView foundAdMessage2 = (TextView) foundAdView.findViewById(R.id.dialog_found_message2);
                         foundAdMessage2.setText("Look for an Ad with the alien symbol");
 
+
                         dialog.setView(foundAdView);
                         dialog.show();
                     }
@@ -150,11 +158,8 @@ public class MainActivity extends FragmentActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        SystemRequirementsChecker.checkWithDefaultDialogs(this);
-
+    protected void onStart(){
+        super.onStart();
         beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
             @Override
             public void onServiceReady() {
@@ -164,9 +169,21 @@ public class MainActivity extends FragmentActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        SystemRequirementsChecker.checkWithDefaultDialogs(this);
+    }
+
+    @Override
     protected void onPause() {
         beaconManager.stopRanging(region);
         super.onPause();
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
     }
 
     @Override
@@ -177,9 +194,10 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    // would map beacons in full development cycle
     private static final Map<String, List<String>> ADVERTISEMENTS_BY_BEACONS;
 
-    // TODO: replace "<major>:<minor>" strings to match your own beacons.
+
     static {
         Map<String, List<String>> placesByBeacons = new HashMap<>();
         placesByBeacons.put("22504:48827", new ArrayList<String>() {{
@@ -189,13 +207,5 @@ public class MainActivity extends FragmentActivity {
             add("Nike");
         }});
         ADVERTISEMENTS_BY_BEACONS = Collections.unmodifiableMap(placesByBeacons);
-    }
-
-    private List<String> placesNearBeacon(Beacon beacon) {
-        String beaconKey = String.format("%d:%d", beacon.getMajor(), beacon.getMinor());
-        if (ADVERTISEMENTS_BY_BEACONS.containsKey(beaconKey)) {
-            return ADVERTISEMENTS_BY_BEACONS.get(beaconKey);
-        }
-        return Collections.emptyList();
     }
 }

@@ -37,7 +37,7 @@ public class LoginActivity extends Activity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.login_toolbar);
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.app_icon, null));
-        toolbar.setTitle("Advercash");
+        toolbar.setTitle("AdverCash");
         toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white));
 
         facebookIcon = (ImageView) findViewById(R.id.facebook_icon);

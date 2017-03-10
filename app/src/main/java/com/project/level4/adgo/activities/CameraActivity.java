@@ -114,7 +114,7 @@ public class CameraActivity extends Activity {
         adOwner = (ImageView) findViewById(R.id.camera_ad_owner);
         placeholderQR = (ImageView) findViewById(R.id.qr_code_placeholder_reward);
 
-        toolbar.setNavigationIcon(resize(getResources().getDrawable(R.drawable.ad_finder_icon, null), 100, 100));
+        toolbar.setNavigationIcon(resize(getResources().getDrawable(R.drawable.app_icon, null), 100, 100));
         toolbar.setTitle("Point at the ad with this alien");
         toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white));
         placeholderQR.setImageDrawable(getResources().getDrawable(R.drawable.qrcodeicon, null));
@@ -170,6 +170,7 @@ public class CameraActivity extends Activity {
                 @Override
                 public void onFinish() {
                     if(countdown.getText().equals("0 seconds")){
+
                         View successDialogView = factory.inflate(R.layout.dialog_success, null);
 
                         dialog2.setView(successDialogView);
@@ -185,6 +186,7 @@ public class CameraActivity extends Activity {
                         mOnCancelListener = new DialogInterface.OnCancelListener() {
                             @Override
                             public void onCancel(DialogInterface dialog) {
+                                dialog.dismiss();
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 intent.putExtra("ad", ad.getAdOwner());
                                 startActivity(intent);
@@ -199,7 +201,8 @@ public class CameraActivity extends Activity {
 
             @Override
             public void onCancel(DialogInterface dialog) {
-               countDownTimer.cancel();
+                dialog.dismiss();
+                countDownTimer.cancel();
             }
 
         };
@@ -459,7 +462,7 @@ public class CameraActivity extends Activity {
     @Override
     protected void onPause() {
         Log.e(TAG, "onPause");
-        //closeCamera();
+        closeCamera();
         stopBackgroundThread();
         super.onPause();
     }

@@ -26,6 +26,10 @@ public class AdvercashApplication extends Application {
     private BeaconManager beaconManager;
     private Advertisement ad;
 
+    /**
+     * Detect beacons in prespecified region,
+     * Alert user with notification, prompting that beacon/ad is located
+     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -65,7 +69,7 @@ public class AdvercashApplication extends Application {
         PendingIntent pendingIntent = PendingIntent.getActivities(this, 0,
                 new Intent[]{notifyIntent}, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.app_icon)
+                .setSmallIcon(R.drawable.nikeicon)
                 .setContentTitle(title + ": " + ad.getAdOwner())
                 .setContentText(message + ad.getReward())
                 .setAutoCancel(true)
