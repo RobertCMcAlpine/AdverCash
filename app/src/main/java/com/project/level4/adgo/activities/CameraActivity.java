@@ -29,6 +29,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Size;
@@ -115,7 +116,7 @@ public class CameraActivity extends Activity {
 
         toolbar.setNavigationIcon(resize(getResources().getDrawable(R.drawable.ad_finder_icon, null), 100, 100));
         toolbar.setTitle("Point at the ad with this alien");
-        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white));
         placeholderQR.setImageDrawable(getResources().getDrawable(R.drawable.qrcodeicon, null));
         adOwner.setImageDrawable(getResources().getDrawable(R.drawable.nikeicon, null));
 //        adListing.setImageDrawable(getResources().getDrawable(R.drawable.nike_hightop, null));

@@ -65,7 +65,7 @@ public class AdvercashApplication extends Application {
         PendingIntent pendingIntent = PendingIntent.getActivities(this, 0,
                 new Intent[]{notifyIntent}, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.nikeicon)
+                .setSmallIcon(R.drawable.app_icon)
                 .setContentTitle(title + ": " + ad.getAdOwner())
                 .setContentText(message + ad.getReward())
                 .setAutoCancel(true)

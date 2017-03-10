@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 
@@ -35,9 +36,9 @@ public class LoginActivity extends Activity {
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.login_toolbar);
-        toolbar.setNavigationIcon(resize(getResources().getDrawable(R.drawable.ad_finder_icon, null), 100, 100));
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.app_icon, null));
         toolbar.setTitle("Advercash");
-        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white));
 
         facebookIcon = (ImageView) findViewById(R.id.facebook_icon);
         facebookIcon.setImageDrawable(getResources().getDrawable(R.drawable.facebook_icon, null));
