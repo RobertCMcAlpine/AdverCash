@@ -2,17 +2,13 @@ package com.project.level4.adgo.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -140,7 +136,7 @@ public class MainActivity extends FragmentActivity {
                         appImage.setImageDrawable(getResources().getDrawable(R.drawable.ad_finder_icon, null));
 
                         TextView foundAdMessage1 = (TextView) foundAdView.findViewById(R.id.dialog_found_message1);
-                        foundAdMessage1.setText("Ad found in your vacinity!");
+                        foundAdMessage1.setText("Ad found in your vicinity!");
 
                         TextView foundAdMessage2 = (TextView) foundAdView.findViewById(R.id.dialog_found_message2);
                         foundAdMessage2.setText("Look for an Ad with the alien symbol");

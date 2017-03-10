@@ -14,9 +14,7 @@ import android.content.Intent;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
-import com.estimote.sdk.Utils;
 import com.project.level4.adgo.R;
-import com.project.level4.adgo.activities.CameraActivity;
 import com.project.level4.adgo.activities.MainActivity;
 import com.project.level4.adgo.utils.Advertisement;
 
