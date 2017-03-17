@@ -44,6 +44,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     private static LatLng UNI_AD_LATLNG_2 = new LatLng(55.872296, -4.288120);
     private static LatLng UNI_AD_LATLNG_3 = new LatLng(55.872493, -4.284723);
     private static LatLng UNI_AD_LATLNG_4 = new LatLng(55.873588, -4.291568);
+    private static LatLng NIKE_AD_LATLNG2 = new LatLng(55.874103, -4.306238);
 
 
 
@@ -76,6 +77,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
         mMapView = (MapView) view.findViewById(R.id.map);
@@ -105,6 +107,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
                     .title("UoG GUU"));
             mGoogleMap.addMarker(new MarkerOptions().position(UNI_AD_LATLNG_4)
                     .title("UoG QMU"));
+            mGoogleMap.addMarker(new MarkerOptions().position(NIKE_AD_LATLNG2)
+                    .title("Nike"));
         }
     }
 

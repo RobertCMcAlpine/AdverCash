@@ -48,6 +48,7 @@ public class BagFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bag, container, false);
     }
@@ -83,7 +84,8 @@ public class BagFragment extends Fragment {
                 balanceDialog.setPositiveButton("Withdraw Balance", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // nothing in prototype
+                        wallet.withdrawBalance();
+                        balance.setText(String.format( "%.2f", wallet.getBalance()));
                     }
                 });
                 balanceDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

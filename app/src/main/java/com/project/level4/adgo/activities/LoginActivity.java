@@ -3,13 +3,17 @@ package com.project.level4.adgo.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.estimote.sdk.SystemRequirementsChecker;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -22,7 +26,13 @@ public class LoginActivity extends Activity {
 
     private LoginButton loginButton;
     private CallbackManager callbackManager;
+
+    private ImageView background;
+    private TextView about;
+
     private ImageView facebookIcon;
+    private ImageView appIcon;
+    private TextView appTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +50,29 @@ public class LoginActivity extends Activity {
         toolbar.setTitle("AdverCash");
         toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white));
 
+        appIcon = (ImageView) findViewById(R.id.advercash_icon);
+        appIcon.setImageDrawable(getResources().getDrawable(R.drawable.app_icon, null));
+
+        appTitle = (TextView) findViewById(R.id.advercash_title);
+        Typeface font = Typeface.createFromAsset(getAssets(), "PixelFJVerdana12pt.ttf");
+        appTitle.setTypeface(font);
+        appTitle.setText("AdverCash");
+
+        about = (TextView) findViewById(R.id.about);
+        about.setTypeface(font);
+        about.setText("Please login to AdverCash using your Facebook account information. " +
+                "If you do not already have a Facebook account, please visit http://www.facebook.com" +
+                "and create an account before proceeding.");
+
+        background = (ImageView) findViewById(R.id.background_colour_image);
+//        background.setImageDrawable(getResources().getDrawable(R.drawable.curtains, null));
+        background.setBackgroundColor(getResources().getColor(R.color.background));
+
         facebookIcon = (ImageView) findViewById(R.id.facebook_icon);
         facebookIcon.setImageDrawable(getResources().getDrawable(R.drawable.facebook_icon, null));
 
         loginButton = (LoginButton) findViewById(R.id.login_button);
+//        loginButton.setBackground(getResources().getDrawable(R.drawable.login_facebook, null));
         loginButton.setReadPermissions("email");
 
         // Initialize callback manager
@@ -81,9 +110,10 @@ public class LoginActivity extends Activity {
         return accessToken != null;
     }
 
-    private Drawable resize(Drawable image, int xSize, int ySize) {
-        Bitmap b = ((BitmapDrawable)image).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, xSize, ySize, false);
-        return new BitmapDrawable(getResources(), bitmapResized);
+
+    @Override
+    protected void onResume() {
+        SystemRequirementsChecker.checkWithDefaultDialogs(this);
+        super.onResume();
     }
 }

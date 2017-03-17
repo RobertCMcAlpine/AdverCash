@@ -11,14 +11,17 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
-import com.estimote.sdk.SystemRequirementsChecker;
 import com.estimote.sdk.Utils;
 import com.project.level4.adgo.R;
 import com.project.level4.adgo.adapters.FixedTabsPagerAdapter;
@@ -52,6 +55,8 @@ public class MainActivity extends FragmentActivity {
 
         dialog = new AlertDialog.Builder(this);
         factory = LayoutInflater.from(this);
+
+
 
         if(savedInstanceState !=null) {
             if (savedInstanceState.containsKey("ad")) {
@@ -109,8 +114,34 @@ public class MainActivity extends FragmentActivity {
         region = new Region("ranged region",
                 UUID.fromString("f7826da6-4fa2-4e98-8024-bc5b71e0893e"), null, null);
 
+        startBeaconManager();
+        determineBeaconProximity();
 
-        //
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.my_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.log_out:
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void startBeaconManager(){
+
         beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
             @Override
             public void onEnteredRegion(Region region, List<Beacon> list) {
@@ -121,7 +152,9 @@ public class MainActivity extends FragmentActivity {
                 // could add an "exit" notification too if you want (-:
             }
         });
+    }
 
+    public void determineBeaconProximity(){
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
             public void onBeaconsDiscovered(Region region, List<Beacon> list) {
@@ -132,10 +165,11 @@ public class MainActivity extends FragmentActivity {
 
                     if (distance < 1 && viewedAds.isEmpty()){
                         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                         beaconManager.stopRanging(region);
                     }
-                  else if (distance > 1 && listening){
+                    else if (distance > 1 && listening){
                         listening = false;
                         final View foundAdView = factory.inflate(R.layout.dialog_found_ad, null);
 
@@ -159,20 +193,21 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onStart(){
+        startBeaconManager();
+        determineBeaconProximity();
         super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
         beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
             @Override
             public void onServiceReady() {
                 beaconManager.startRanging(region);
             }
         });
-    }
 
-    @Override
-    protected void onResume() {
         super.onResume();
-
-        SystemRequirementsChecker.checkWithDefaultDialogs(this);
     }
 
     @Override

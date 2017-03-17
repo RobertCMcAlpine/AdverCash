@@ -30,6 +30,7 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Size;
@@ -45,6 +46,7 @@ import android.widget.Toast;
 
 import com.project.level4.adgo.R;
 import com.project.level4.adgo.utils.Advertisement;
+import com.project.level4.adgo.utils.DeviceOrientation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -96,6 +98,11 @@ public class CameraActivity extends Activity {
     private android.support.v7.app.AlertDialog.Builder dialog2;
     private LayoutInflater factory;
 
+    private AlertDialog visibleDialog;
+
+    private DeviceOrientation deviceOrientation;
+    private boolean active;
+
 
 
     @Override
@@ -109,7 +116,7 @@ public class CameraActivity extends Activity {
         dialog2 = new android.support.v7.app.AlertDialog.Builder(this);
         factory = LayoutInflater.from(this);
 
-//        adListing = (ImageView) findViewById(R.id.camera_ad_icon);
+//
         adInformation = (TextView) findViewById(R.id.camera_ad_info);
         adOwner = (ImageView) findViewById(R.id.camera_ad_owner);
         placeholderQR = (ImageView) findViewById(R.id.qr_code_placeholder_reward);
@@ -119,20 +126,19 @@ public class CameraActivity extends Activity {
         toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white));
         placeholderQR.setImageDrawable(getResources().getDrawable(R.drawable.qrcodeicon, null));
         adOwner.setImageDrawable(getResources().getDrawable(R.drawable.nikeicon, null));
-//        adListing.setImageDrawable(getResources().getDrawable(R.drawable.nike_hightop, null));
+//
         adInformation.setText("Reward: 20% Discount in Store\n\n\n Prize: £0.05");
 
         textureView = (TextureView) findViewById(R.id.texture);
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
 
-        textureView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchRingDialog(v);
-            }
-        });
+        deviceOrientation = new DeviceOrientation(this);
+        active = true;
+    }
 
+    public void orientationSuccess(){
+        launchRingDialog(textureView);
     }
 
     private Drawable resize(Drawable image, int xSize, int ySize) {
@@ -189,13 +195,16 @@ public class CameraActivity extends Activity {
                                 dialog.dismiss();
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 intent.putExtra("ad", ad.getAdOwner());
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
                                 finish();
                             }
                         };
                         dialog2.setOnCancelListener(mOnCancelListener);
                     }
-                    dialog2.show();
+                    visibleDialog.dismiss();
+                    visibleDialog = dialog2.create();
+                    if (active) visibleDialog.show();
                 }
             }.start();
 
@@ -203,11 +212,22 @@ public class CameraActivity extends Activity {
             public void onCancel(DialogInterface dialog) {
                 dialog.dismiss();
                 countDownTimer.cancel();
+                if (deviceOrientation != null) {
+                    deviceOrientation.setSuccess(false);
+                }
             }
 
         };
         dialog1.setOnCancelListener(mOnCancelListener);
-        dialog1.show();
+        visibleDialog = dialog1.create();
+        if (active) visibleDialog.show();
+    }
+
+    public void orientationFailure(){
+        if (visibleDialog != null){
+            visibleDialog.cancel();
+            if (deviceOrientation != null) deviceOrientation.setSuccess(false);
+        }
     }
 
 
@@ -272,95 +292,6 @@ public class CameraActivity extends Activity {
         }
     }
 
-    protected void takePicture() {
-        if (null == cameraDevice) {
-            Log.e(TAG, "cameraDevice is null");
-            return;
-        }
-        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        try {
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
-            Size[] jpegSizes = null;
-            if (characteristics != null) {
-                jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
-            }
-            int width = 640;
-            int height = 480;
-            if (jpegSizes != null && 0 < jpegSizes.length) {
-                width = jpegSizes[0].getWidth();
-                height = jpegSizes[0].getHeight();
-            }
-            ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
-            List<Surface> outputSurfaces = new ArrayList<Surface>(2);
-            outputSurfaces.add(reader.getSurface());
-            outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
-            final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            captureBuilder.addTarget(reader.getSurface());
-            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-            // Orientation
-            int rotation = getWindowManager().getDefaultDisplay().getRotation();
-            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
-            final File file = new File(Environment.getExternalStorageDirectory() + "/pic.jpg");
-            ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
-                @Override
-                public void onImageAvailable(ImageReader reader) {
-                    Image image = null;
-                    try {
-                        image = reader.acquireLatestImage();
-                        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-                        byte[] bytes = new byte[buffer.capacity()];
-                        buffer.get(bytes);
-                        save(bytes);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (image != null) {
-                            image.close();
-                        }
-                    }
-                }
-
-                private void save(byte[] bytes) throws IOException {
-                    OutputStream output = null;
-                    try {
-                        output = new FileOutputStream(file);
-                        output.write(bytes);
-                    } finally {
-                        if (null != output) {
-                            output.close();
-                        }
-                    }
-                }
-            };
-            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
-            final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
-                @Override
-                public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
-                    super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(CameraActivity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
-                    createCameraPreview();
-                }
-            };
-            cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
-                @Override
-                public void onConfigured(CameraCaptureSession session) {
-                    try {
-                        session.capture(captureBuilder.build(), captureListener, mBackgroundHandler);
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onConfigureFailed(CameraCaptureSession session) {
-                }
-            }, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
 
     protected void createCameraPreview() {
         try {
@@ -449,21 +380,36 @@ public class CameraActivity extends Activity {
 
     @Override
     protected void onResume() {
-        super.onResume();
         Log.e(TAG, "onResume");
+        active = true;
         startBackgroundThread();
         if (textureView.isAvailable()) {
             openCamera();
         } else {
             textureView.setSurfaceTextureListener(textureListener);
         }
+        super.onResume();
     }
 
     @Override
     protected void onPause() {
         Log.e(TAG, "onPause");
+        active = false;
         closeCamera();
         stopBackgroundThread();
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        active = false;
+        deviceOrientation = null;
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        active = true;
+        super.onStart();
     }
 }
