@@ -1,11 +1,16 @@
 package com.project.level4.adgo.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,6 +20,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.project.level4.adgo.R;
+import com.project.level4.adgo.activities.CameraActivity;
+import com.project.level4.adgo.activities.LoginActivity;
+import com.project.level4.adgo.activities.LogoutActivity;
 import com.project.level4.adgo.activities.MainActivity;
 import com.project.level4.adgo.adapters.AdvertisementAdapter;
 import com.project.level4.adgo.utils.Advertisement;
@@ -24,6 +32,7 @@ import java.util.List;
 
 public class BagFragment extends Fragment {
 
+    private ImageView optionsMenu;
     private ImageView walletIcon;
     private TextView balance;
 
@@ -58,11 +67,20 @@ public class BagFragment extends Fragment {
         super.onStart();
 
         walletIcon = (ImageView) getView().findViewById(R.id.wallet_icon);
+        optionsMenu = (ImageView) getView().findViewById(R.id.options_menu);
         balance = (TextView) getView().findViewById(R.id.balance);
 
         walletIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_account_balance_wallet_black_48dp, null));
+        optionsMenu.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_black_24dp, null));
 
         balance.setText(String.format( "%.2f", wallet.getBalance()));
+
+        optionsMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopup(v);
+            }
+        });
 
         RelativeLayout balanceInformation = (RelativeLayout) getView().findViewById(R.id.account_information);
         balanceInformation.setOnClickListener(new View.OnClickListener() {
@@ -131,6 +149,22 @@ public class BagFragment extends Fragment {
                 }
             });
         }
+    }
+
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(getContext(), v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.my_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(getContext(), LogoutActivity.class);
+                startActivity(intent);
+                ((Activity)getContext()).finish();
+                return false;
+            }
+        });
+        popup.show();
     }
 
 

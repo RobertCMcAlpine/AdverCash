@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -116,29 +117,8 @@ public class MainActivity extends FragmentActivity {
 
         startBeaconManager();
         determineBeaconProximity();
-
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.my_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.log_out:
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     public void startBeaconManager(){
 
@@ -182,9 +162,10 @@ public class MainActivity extends FragmentActivity {
                         TextView foundAdMessage2 = (TextView) foundAdView.findViewById(R.id.dialog_found_message2);
                         foundAdMessage2.setText("Look for an Ad with the alien symbol");
 
-
                         dialog.setView(foundAdView);
                         dialog.show();
+                        startBeaconManager();
+                        determineBeaconProximity();
                     }
                 }
             }
@@ -206,6 +187,7 @@ public class MainActivity extends FragmentActivity {
                 beaconManager.startRanging(region);
             }
         });
+
 
         super.onResume();
     }

@@ -22,7 +22,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.project.level4.adgo.R;
 
-public class LoginActivity extends Activity {
+public class LogoutActivity extends Activity {
 
     private LoginButton loginButton;
     private CallbackManager callbackManager;
@@ -41,11 +41,11 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if (isLoggedIn() && !fired){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
+//        if (isLoggedIn() && !fired){
+//            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//            startActivity(intent);
+//            finish();
+//        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.login_toolbar);
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.app_icon, null));
@@ -107,10 +107,10 @@ public class LoginActivity extends Activity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    public boolean isLoggedIn() {
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        return accessToken != null;
-    }
+//    public boolean isLoggedIn() {
+//        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+//        return accessToken != null;
+//    }
 
 
     @Override

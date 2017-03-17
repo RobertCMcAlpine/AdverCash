@@ -204,7 +204,7 @@ public class CameraActivity extends Activity {
                     }
                     visibleDialog.dismiss();
                     visibleDialog = dialog2.create();
-                    if (active) visibleDialog.show();
+                    if (active && !visibleDialog.isShowing()) visibleDialog.show();
                 }
             }.start();
 
@@ -220,7 +220,7 @@ public class CameraActivity extends Activity {
         };
         dialog1.setOnCancelListener(mOnCancelListener);
         visibleDialog = dialog1.create();
-        if (active) visibleDialog.show();
+        if (active && !visibleDialog.isShowing()) visibleDialog.show();
     }
 
     public void orientationFailure(){
